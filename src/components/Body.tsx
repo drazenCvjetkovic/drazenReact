@@ -1,123 +1,153 @@
-import * as React from "react";
-import {CardContent} from "@material-ui/core";
-import Card from "@material-ui/core/Card";
-import Typography from "@material-ui/core/Typography";
-import CardActions from "@material-ui/core/CardActions";
+import { CardContent } from "@material-ui/core";
 import Button from "@material-ui/core/Button";
+import Card from "@material-ui/core/Card";
+import CardActions from "@material-ui/core/CardActions";
 import makeStyles from "@material-ui/core/styles/makeStyles";
-
-import {countries} from "../countries"
 import TextField from "@material-ui/core/TextField";
+import Typography from "@material-ui/core/Typography";
+import * as React from "react";
+import { countries } from "../countries";
 
 const useStyles = makeStyles({
-    card: {
-        minWidth: 275,
-        textAlign: "center"
-    },
+  card: {
+    minWidth: 275,
+    textAlign: "center"
+  },
 
-    title: {
-        fontSize: 14,
-    },
-    pos: {
-        marginBottom: 12,
-    },
-    button: {
-        backgroundColor: "red",
-        color: "#f4f4f4f4",
-        width: "25%"
-    },
-    root: {
-        justifyContent: 'center'
-    },
-    country_flag: {
-        //  width:"100px",
-        //  height:"80px"
-    }
+  title: {
+    fontSize: 14
+  },
+  pos: {
+    marginBottom: 12
+  },
+  button: {
+    backgroundColor: "red",
+    color: "#f4f4f4f4",
+    width: "25%"
+  },
+  root: {
+    justifyContent: "center"
+  },
+  country_flag: {
+    //  width:"100px",
+    //  height:"80px"
+  }
 });
 
 /*let answerArray :[] = [
     item:string
 ]*/
 
-
-
-
 const Body = () => {
+  const classes = useStyles();
+  const [countryCode, setCountryCode] = React.useState("hr");
+  const [countryName, setCountryName] = React.useState("Hrvatska");
 
-    const classes = useStyles();
-    const [countryCode, setCountryCode] = React.useState("hr")
-    const [countryName, setCountryName] = React.useState("Hrvatska")
+  const [usedLetter, setUsedLetter] = React.useState([""]);
+  const [curentLetter, setCurrentLetter] = React.useState("");
+  const [scoredLetter, setScoredLetter] = React.useState([""]);
 
-    const generateRandomCountry = () => {
+  const [count,setCount] = React.useState(countryName.length)
 
-        let item = countries[Math.floor(Math.random() * countries.length)];
+  React.useEffect(() => {
+    setInitScore(countryName);
+  }, []);
 
-        setCountryCode(item.alpha_code);
-        setCountryName(item.name)
-        console.log(item.alpha_code)
-
-        return item
-    };
-
-    const showLetters = () => {
-
-        /*for (var i = 0; i < countryName.length; i++) {
-           let answerArray[i] = "_";
-        }*/
-
-        for (var i = 0; i < countryName.length; i++) {
-
-        }
-
-
+  const setInitScore = (countryName: string) => {
+    let out = Array<string>();
+    for (var i = 0; i < countryName.length; i++) {
+      out[i] = "_";
     }
-    return (
-        <Card className={classes.card}>
-            <CardContent>
-                <Typography className={classes.title} color="textSecondary" gutterBottom>
-                    Klikni na gumb
-                </Typography>
+    setScoredLetter(out);
+  };
+  const generateRandomCountry = () => {
+    let item = countries[Math.floor(Math.random() * countries.length)];
 
-                {/*samo za primjer::*/}
-                {/* <Typography className={classes.pos} color="textSecondary">
-                    uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu
-                </Typography>
-                <Typography variant="body2" component="p">
-                    well meaning and kindly.
-                    txxxxxxxxxxxtxxtttttxxxxxxxxxxxxx
-                    <br/>
-                </Typography>*/}
-            </CardContent>
-            <CardContent classes={{root: classes.root}}>
-                {
+    setCountryCode(item.alpha_code);
+    setCountryName(item.name);
+    setInitScore(item.name);
+    setCurrentLetter("");
+    console.log(item.alpha_code);
 
-                }
-                <Typography component={"h3"}>Država</Typography>
+    return item;
+  };
 
-                <img className={classes.country_flag} src={`https://www.countryflags.io/${countryCode}/flat/64.png`}/>
+  document.body.addEventListener("keyup", function(event) {
+    //  console.log(event.key);
+    // console.log(event.code);
+    setCurrentLetter(event.key);
+    setUsedLetter([...usedLetter, event.key]);
+  });
 
-                {/*
+  const showLetters = () => {
+    let out = "";
+
+        for (var i = 0; i < scoredLetter.length; i++) {
+      if (countryName[i].toLowerCase() == curentLetter) {
+        scoredLetter[i] = curentLetter;
+      }
+      
+    /*   else{
+        setCurrentLetter('')
+
+       // setCount(count - 1)
+      } */
+    }
+    
+    scoredLetter.map((m: string) => {
+      out += m + " ";
+    });
+    console.log("Scored:", scoredLetter);
+    console.log("CurrentLetter:", curentLetter);
+    console.log("Usedletters:", usedLetter);
+    return out.toUpperCase();
+  };
+
+  return (
+    <Card className={classes.card}>
+      <CardContent>
+        <Typography
+          className={classes.title}
+          color="textSecondary"
+          gutterBottom
+        >
+          Klikni na gumb
+        </Typography>
+      </CardContent>
+      <CardContent classes={{ root: classes.root }}>
+        <Typography component={"h3"}>Broj pokušaja</Typography>
+        <Typography>{count}</Typography>
+        <div>
+          <img
+            className={classes.country_flag}
+            src={`https://www.countryflags.io/${countryCode}/flat/64.png`}
+          />
+        </div>
+
+        {/*
+
                 <img className={classes.country_flag} src={`https://www.countryflags.io/br/flat/64.png`}/>
 */}
 
+        {showLetters()}
+        <hr></hr>
+      </CardContent>
 
-                <Typography component={"h1"}>
-                    <TextField value={countryName}/>
-                </Typography>
-                {
-                    showLetters()
-                }
-            </CardContent>
+      <CardActions classes={{ root: classes.root }}>
+        <Button
+          size="medium"
+          variant={"outlined"}
+          className={classes.button}
+          onClick={generateRandomCountry}
+        >
+          Nova igra
+        </Button>
+      </CardActions>
+    </Card>
+  );
+};
 
-
-            <CardActions classes={{root: classes.root}}>
-                <Button size="medium" variant={"outlined"} className={classes.button}
-                        onClick={generateRandomCountry}>Start</Button>
-            </CardActions>
-        </Card>)
-}
-
-export default Body
+export default Body;
 
 //"https://www.countryflags.io/hr/flat/64.png"
 
