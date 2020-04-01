@@ -1,4 +1,4 @@
-import { CardContent } from "@material-ui/core";
+import { CardContent, FormControl } from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 import Card from "@material-ui/core/Card";
 import CardActions from "@material-ui/core/CardActions";
@@ -7,6 +7,10 @@ import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 import * as React from "react";
 import { countries } from "../countries";
+
+import { KeyboardEvent } from "react";
+import { deprecate } from "util";
+import Alert from "./Alert";
 
 const useStyles = makeStyles({
   card: {
@@ -38,20 +42,59 @@ const useStyles = makeStyles({
     item:string
 ]*/
 
-const Body = () => {
-  const classes = useStyles();
-  const [countryCode, setCountryCode] = React.useState("hr");
-  const [countryName, setCountryName] = React.useState("Hrvatska");
+/** */
+const useKey = () => {
+  const [pressed, setPressed] = React.useState(false);
 
-  const [usedLetter, setUsedLetter] = React.useState([""]);
-  const [curentLetter, setCurrentLetter] = React.useState("");
-  const [scoredLetter, setScoredLetter] = React.useState([""]);
+  const [letter, setLetter] = React.useState("");
 
-  const [count,setCount] = React.useState(countryName.length)
+  const match = (event: any) => event.key.toLowerCase() !== "";
+
+  const onDown = (event: any) => {
+    if (match(event)) {
+      setPressed(true);
+      setLetter(event.key);
+    }
+    // setPressed(true)
+  };
+
+  const onUp = (event: any) => {
+    if (match(event)) setPressed(false);
+    //setPressed(false)
+  };
 
   React.useEffect(() => {
-    setInitScore(countryName);
+    window.addEventListener("keydown", onDown);
+    window.addEventListener("keyup", onUp);
+
+    return () => {
+      document.removeEventListener("keydown", onDown);
+      document.removeEventListener("keyup", onUp);
+    };
   }, []);
+
+  return letter;
+
+  // console.log("Pressed",pressed, letter);
+};
+
+const Body = () => {
+  const classes = useStyles();
+  const [countryCode, setCountryCode] = React.useState("");
+  const [countryName, setCountryName] = React.useState("");
+
+  const [usedLetters, setUsedLetters] = React.useState(Array<String>());
+  const [currentLetter, setCurrentLetter] = React.useState(String);
+
+  /*  const [state, setState] = React.useState({
+    currentLetter: "",
+    usedLetters: Array<String>()
+  }); */
+  let keyPressed = useKey();
+
+  const [scoredLetter, setScoredLetter] = React.useState(Array<string>());
+
+  const [count, setCount] = React.useState(6);
 
   const setInitScore = (countryName: string) => {
     let out = Array<string>();
@@ -60,46 +103,77 @@ const Body = () => {
     }
     setScoredLetter(out);
   };
+
   const generateRandomCountry = () => {
     let item = countries[Math.floor(Math.random() * countries.length)];
-
     setCountryCode(item.alpha_code);
     setCountryName(item.name);
     setInitScore(item.name);
-    setCurrentLetter("");
-    console.log(item.alpha_code);
-
-    return item;
+    //setCount(6)
   };
 
-  document.body.addEventListener("keyup", function(event) {
+  const onInit = () => {
+    generateRandomCountry();
+    window.location.reload();
+  };
+
+  if (countryName == "") {
+    generateRandomCountry();
+  }
+
+  /** */
+  console.log("Scored:", scoredLetter);
+  console.log("CurrentLetter:", currentLetter);
+  console.log("Usedletters:", usedLetters);
+  /*
+ document.addEventListener("keypress", function(event) {
     //  console.log(event.key);
-    // console.log(event.code);
-    setCurrentLetter(event.key);
-    setUsedLetter([...usedLetter, event.key]);
-  });
+
+     console.log("Presseed",event);
+  }) */
+
+  const handleLetter = (letter: string) => {
+    if (letter !== "" && letter !== currentLetter) {
+      setCurrentLetter(letter);
+    }
+  };
 
   const showLetters = () => {
-    let out = "";
+    handleLetter(keyPressed);
 
-        for (var i = 0; i < scoredLetter.length; i++) {
-      if (countryName[i].toLowerCase() == curentLetter) {
-        scoredLetter[i] = curentLetter;
+    let out = "";
+    if (countryName) {
+      scoredLetter.map((value, key) => {
+        if (countryName[key].toLowerCase() == currentLetter) {
+          scoredLetter[key] = currentLetter;
+        }
+      });
+
+      //ako ga nema zapiši
+
+      if (
+        scoredLetter.indexOf(currentLetter) == -1 &&
+        usedLetters.indexOf(currentLetter) == -1
+      ) {
+        let temp = usedLetters;
+        temp.push(currentLetter);
+
+        setUsedLetters(temp);
+        setCount(count - 1);
+
+        console.log("Nema");
       }
-      
-    /*   else{
+
+      /*   else{
         setCurrentLetter('')
 
        // setCount(count - 1)
       } */
     }
-    
+
     scoredLetter.map((m: string) => {
       out += m + " ";
     });
-    console.log("Scored:", scoredLetter);
-    console.log("CurrentLetter:", curentLetter);
-    console.log("Usedletters:", usedLetter);
     return out.toUpperCase();
   };
 
@@ -115,7 +189,7 @@ const Body = () => {
         </Typography>
       </CardContent>
       <CardContent classes={{ root: classes.root }}>
-        <Typography component={"h3"}>Broj pokušaja</Typography>
+        <Typography component={"h3"}>Dozvoljeni promašaji:</Typography>
         <Typography>{count}</Typography>
         <div>
           <img
@@ -130,6 +204,7 @@ const Body = () => {
 */}
 
         {showLetters()}
+
         <hr></hr>
       </CardContent>
 
@@ -138,11 +213,15 @@ const Body = () => {
           size="medium"
           variant={"outlined"}
           className={classes.button}
-          onClick={generateRandomCountry}
+          onClick={
+            onInit
+          }
         >
           Nova igra
         </Button>
       </CardActions>
+
+      {<Alert open={count == 0} setAlert={() => onInit()} />}
     </Card>
   );
 };
