@@ -1,49 +1,259 @@
 import { CardContent, FormControl } from "@material-ui/core";
-import Button from "@material-ui/core/Button";
 import Card from "@material-ui/core/Card";
-import CardActions from "@material-ui/core/CardActions";
 import makeStyles from "@material-ui/core/styles/makeStyles";
-import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 import * as React from "react";
 import { countries } from "../countries";
 
-import { KeyboardEvent } from "react";
-import { deprecate } from "util";
 import Alert from "./Alert";
+import WinAlert from "./WinAlert";
 
 const useStyles = makeStyles({
   card: {
     minWidth: 275,
-    textAlign: "center"
+    textAlign: "center",
   },
 
   title: {
-    fontSize: 14
+    fontSize: 14,
   },
   pos: {
-    marginBottom: 12
+    marginBottom: 12,
   },
   button: {
     backgroundColor: "red",
     color: "#f4f4f4f4",
-    width: "25%"
+    width: "25%",
   },
   root: {
-    justifyContent: "center"
+    justifyContent: "center",
   },
   country_flag: {
-    //  width:"100px",
-    //  height:"80px"
-  }
+    width: "100px",
+    height: "80px",
+  },
 });
+interface IBodyProps {
+  setPoints: Function;
+  points: any;
+  player: string;
+}
+//TODO::nakon izgubljene da se resetira usedCountry
+const Body = (props: IBodyProps) => {
+  const onKeyPress = (event: any) => {
+    setCurrentLetter(event.key);
+  };
 
-/*let answerArray :[] = [
-    item:string
-]*/
+  React.useEffect(() => {
+    onInit(true);
+  }, []);
 
-/** */
-const useKey = () => {
+  React.useEffect(() => {
+    window.addEventListener("keypress", onKeyPress);
+
+    return () => {
+      document.removeEventListener("keypress", onKeyPress);
+    };
+  }, []);
+
+  const classes = useStyles();
+
+  const [init, setInit] = React.useState(false);
+
+  const [score, setScore] = React.useState(Array<Object>());
+
+  const [open, setOpen] = React.useState(false);
+  const [countryCode, setCountryCode] = React.useState(String);
+  const [countryName, setCountryName] = React.useState(String);
+  const [usedCountries, setUsedCountries] = React.useState(Array<String>());
+  const [count, setCount] = React.useState(5);
+
+  const [usedLetters, setUsedLetters] = React.useState(Array<String>());
+  const [currentLetter, setCurrentLetter] = React.useState(String);
+  const [scoredLetter, setScoredLetter] = React.useState(Array<string>());
+
+  const saveGame = () => {
+    //spremi rezultat na kraju igre
+    const player = {
+      name: props.player,
+      points: props.points,
+    };
+    setScore([...score, player]);
+    //zapiši u local storage
+    window.location.reload();
+
+    // setOpen(false)
+    // onInit(true)
+  };
+
+  const setInitScore = (countryName: string) => {
+    ///postavi prazna polja
+    let out = Array<string>();
+    for (var i = 0; i < countryName.length; i++) {
+      out[i] = "_";
+    }
+    setScoredLetter(out);
+  };
+
+  const checkIsThisCountryUsed = (alpha_code: String) => {
+    return usedCountries.indexOf(alpha_code) !== -1;
+  };
+
+  const generateRandomCountry = (): any => {
+    let item = countries[Math.floor(Math.random() * countries.length)];
+
+    if (
+      checkIsThisCountryUsed(item.alpha_code) &&
+      usedCountries.length !== countries.length
+    ) {
+      //ako ga ima generiraj ponovno
+      return generateRandomCountry();
+    }
+    return item;
+  };
+
+  const onInit = (newGame: Boolean = false) => {
+    if (newGame && usedCountries.length > 0) setUsedCountries(Array<String>()); ///ako je nova igra(izgubio ili početak)
+
+    const item = generateRandomCountry();
+
+    if (!newGame) {
+      //
+      props.setPoints(props.points + 1);
+      setUsedCountries([...usedCountries, item.alpha_code]);
+    }
+
+    setCountryCode(item.alpha_code);
+    setCountryName(item.name);
+
+    setInitScore(item.name);
+
+    setCount(6); ///current letter je "",pa skine jedan count
+    setUsedLetters(Array<String>());
+    setCurrentLetter("");
+
+    if (!init) setInit(true);
+  };
+
+  console.log("ScoredLetters:", scoredLetter);
+  console.log("CurrentLetter:", currentLetter);
+  console.log("Usedletters:", usedLetters);
+  console.log("UsedCountries", usedCountries);
+  console.log("CountryName", countryName);
+  console.log("score", score);
+  console.log(init);
+  console.log("---------------------------------------------------");
+
+  const checkScored = (array: Array<String>) => {
+    ///sve si pogodio!!!
+    return array.indexOf("_") == -1;
+  };
+
+  const newLetter = (pressedLetter: string) => {
+    scoredLetter.map((value, key) => {
+      if (countryName[key].toLowerCase() == pressedLetter) {
+        scoredLetter[key] = pressedLetter;
+      }
+    });
+
+    //ako ga nema zapiši
+
+    if (
+      scoredLetter.indexOf(pressedLetter) == -1 &&
+      usedLetters.indexOf(pressedLetter) == -1
+    ) {
+      let temp = usedLetters;
+      temp.push(pressedLetter);
+      setUsedLetters(temp);
+      setCount(count - 1);
+    }
+  };
+
+  const showLetters = () => {
+    newLetter(currentLetter);
+    let out = "";
+
+    scoredLetter.map((m: string) => {
+      out += m + " ";
+    });
+
+    if (scoredLetter.length != 0 && checkScored(scoredLetter)) {
+      return (
+        //pobijedio ,daj novu zastavu
+        <Alert
+          open={true}
+          onClose={() => onInit()}
+          lose={false}
+          country={countryName}
+        />
+      );
+    }
+
+    return (
+      <Typography variant={"h3"} style={{ marginBottom: "20px" }}>
+        {" "}
+        {out.toUpperCase()}{" "}
+      </Typography>
+    );
+  };
+
+  return (
+    <>
+      {init && countries.length > usedCountries.length && (
+        <Card className={classes.card}>
+          <CardContent>
+            <Typography
+              className={classes.title}
+              color="textSecondary"
+              gutterBottom
+            >
+              Ovo je zastava koje države ?
+            </Typography>
+          </CardContent>
+          <CardContent classes={{ root: classes.root }}>
+            <Typography
+              ///  className={classes.title}
+              color="textSecondary"
+              gutterBottom
+            >
+              Dozvoljeni promašaji:
+            </Typography>
+            <Typography variant={"h4"}>{count}</Typography>
+            <div>
+              <img
+                className={classes.country_flag}
+                src={`https://www.countryflags.io/${countryCode.toLowerCase()}/flat/64.png`}
+
+                //src={`https://www.countryflags.io/${'at'}/flat/64.png`}
+              />
+            </div>
+
+            {showLetters()}
+
+          </CardContent>
+
+
+          {<Alert open={count <= 0} onClose={() => onInit(true)} lose={true} />}
+        </Card>
+      )}
+
+      {countries.length <= usedCountries.length && (
+        <WinAlert
+          player={props.player}
+          points={props.points}
+          open={true}
+          onClose={() => saveGame()}
+        />
+      )}
+    </>
+  );
+};
+
+export default Body;
+
+/**
+ * funkcija sluša pritisak tipkovnice
+ * const useKey = () => {
   const [pressed, setPressed] = React.useState(false);
 
   const [letter, setLetter] = React.useState("");
@@ -60,7 +270,6 @@ const useKey = () => {
 
   const onUp = (event: any) => {
     if (match(event)) setPressed(false);
-    //setPressed(false)
   };
 
   React.useEffect(() => {
@@ -74,159 +283,8 @@ const useKey = () => {
   }, []);
 
   return letter;
-
-  // console.log("Pressed",pressed, letter);
 };
-
-const Body = () => {
-  const classes = useStyles();
-  const [countryCode, setCountryCode] = React.useState("");
-  const [countryName, setCountryName] = React.useState("");
-
-  const [usedLetters, setUsedLetters] = React.useState(Array<String>());
-  const [currentLetter, setCurrentLetter] = React.useState(String);
-
-  /*  const [state, setState] = React.useState({
-    currentLetter: "",
-    usedLetters: Array<String>()
-  }); */
-  let keyPressed = useKey();
-
-  const [scoredLetter, setScoredLetter] = React.useState(Array<string>());
-
-  const [count, setCount] = React.useState(6);
-
-  const setInitScore = (countryName: string) => {
-    let out = Array<string>();
-    for (var i = 0; i < countryName.length; i++) {
-      out[i] = "_";
-    }
-    setScoredLetter(out);
-  };
-
-  const generateRandomCountry = () => {
-    let item = countries[Math.floor(Math.random() * countries.length)];
-    setCountryCode(item.alpha_code);
-    setCountryName(item.name);
-    setInitScore(item.name);
-    //setCount(6)
-  };
-
-  const onInit = () => {
-    generateRandomCountry();
-    window.location.reload();
-  };
-
-  if (countryName == "") {
-    generateRandomCountry();
-  }
-
-  /** */
-  console.log("Scored:", scoredLetter);
-  console.log("CurrentLetter:", currentLetter);
-  console.log("Usedletters:", usedLetters);
-  /*
- document.addEventListener("keypress", function(event) {
-    //  console.log(event.key);
-
-     console.log("Presseed",event);
-  }) */
-
-  const handleLetter = (letter: string) => {
-    if (letter !== "" && letter !== currentLetter) {
-      setCurrentLetter(letter);
-    }
-  };
-
-  const showLetters = () => {
-    handleLetter(keyPressed);
-
-    let out = "";
-    if (countryName) {
-      scoredLetter.map((value, key) => {
-        if (countryName[key].toLowerCase() == currentLetter) {
-          scoredLetter[key] = currentLetter;
-        }
-      });
-
-      //ako ga nema zapiši
-
-      if (
-        scoredLetter.indexOf(currentLetter) == -1 &&
-        usedLetters.indexOf(currentLetter) == -1
-      ) {
-        let temp = usedLetters;
-        temp.push(currentLetter);
-
-        setUsedLetters(temp);
-        setCount(count - 1);
-
-        console.log("Nema");
-      }
-
-      /*   else{
-        setCurrentLetter('')
-
-       // setCount(count - 1)
-      } */
-    }
-
-    scoredLetter.map((m: string) => {
-      out += m + " ";
-    });
-    return out.toUpperCase();
-  };
-
-  return (
-    <Card className={classes.card}>
-      <CardContent>
-        <Typography
-          className={classes.title}
-          color="textSecondary"
-          gutterBottom
-        >
-          Klikni na gumb
-        </Typography>
-      </CardContent>
-      <CardContent classes={{ root: classes.root }}>
-        <Typography component={"h3"}>Dozvoljeni promašaji:</Typography>
-        <Typography>{count}</Typography>
-        <div>
-          <img
-            className={classes.country_flag}
-            src={`https://www.countryflags.io/${countryCode}/flat/64.png`}
-          />
-        </div>
-
-        {/*
-
-                <img className={classes.country_flag} src={`https://www.countryflags.io/br/flat/64.png`}/>
-*/}
-
-        {showLetters()}
-
-        <hr></hr>
-      </CardContent>
-
-      <CardActions classes={{ root: classes.root }}>
-        <Button
-          size="medium"
-          variant={"outlined"}
-          className={classes.button}
-          onClick={
-            onInit
-          }
-        >
-          Nova igra
-        </Button>
-      </CardActions>
-
-      {<Alert open={count == 0} setAlert={() => onInit()} />}
-    </Card>
-  );
-};
-
-export default Body;
+ */
 
 //"https://www.countryflags.io/hr/flat/64.png"
 

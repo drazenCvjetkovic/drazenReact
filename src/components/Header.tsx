@@ -14,7 +14,10 @@ const Header =(props:IHeaderProps) => {
     return (
 
         <>
-            <MyAppBar loggedUser={props.loggedUser} users={props.users}/>
+           
+            {/* <MyAppBar loggedUser={props.loggedUser} users={props.users}/> */}
+
+        
             </>
     )
 }

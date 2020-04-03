@@ -9,37 +9,34 @@ import {
 } from "@material-ui/core";
 import { lightGreen, red } from "@material-ui/core/colors";
 
-interface IAlertProps {
+interface IWinAlertProps {
   onClose: Function;
   open: boolean;
-  lose?: boolean;
-  country?: string;
+
+  player: string;
+  points: number;
 }
 
-const Alert = (props: IAlertProps) => {
-  const country = props.country && props.country.toUpperCase();
+const WinAlert = (props: IWinAlertProps) => {
+
   return (
     <div>
-      {/*  <Button variant="outlined" color="primary" onClick={handleClickOpen}>
-     Open alert dialog
-   </Button> */}
-
+    
       <Dialog
         disableEscapeKeyDown
         fullWidth
         maxWidth={"xs"}
         open={props.open}
-        // style={{width:"450px" ,textAlign:"center"}}
-        //  onClose={() => props.setAlert()}
+     
       >
         <DialogTitle style={{ textAlign: "center" }}>
-          {props.lose ? "Izgubio si" : country  + " odlično"}
+          Bravo {props.player} !!! Došao si do kraja igre."
+          Osvoijo si {props.points} bodova.
         </DialogTitle>
         <DialogContent>
           <DialogContentText style={{ textAlign: "center" }}>
-            {props.lose
-              ? "Potrošio si sve dozvoljene promašaje,klikni za novu igru."
-              : "Klikni za sljedeću zastavu."}
+            
+            Klikni za sljedeću zastavu.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -50,7 +47,7 @@ const Alert = (props: IAlertProps) => {
             variant={"outlined"}
             style={{ backgroundColor: "lightblue" }}
           >
-            {"Start"}
+            {"Spremi"}
           </Button>
           {/*  <Button onClick={handleClose} color="primary" autoFocus>
             Agree
@@ -60,4 +57,4 @@ const Alert = (props: IAlertProps) => {
     </div>
   );
 };
-export default Alert;
+export default WinAlert;
