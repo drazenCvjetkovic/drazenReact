@@ -44,9 +44,7 @@ const Alert = (props: IAlertProps) => {
         </DialogContent>
         <DialogActions onDragEnter={() => props.onClose()}>
           <Button
-            //onClick={() => props.onClose()}
-            onKeyDown={() => props.onClose()}
-            onBlur={() => props.onClose()}
+            onClick={() => props.onClose()}
             fullWidth={true}
             size='large'
             variant={'outlined'}
