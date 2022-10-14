@@ -219,10 +219,7 @@ const Body = (props: IBodyProps) => {
               Dozvoljeni promašaji:
             </Typography>
             <Typography variant={'h4'}>{count}</Typography>
-            <div>
-              <img
-                className={classes.country_flag}
-            <Typography variant={"h1"}>{count}</Typography>
+
             <div>
               <img
                 className={classes.country_flag}
@@ -236,8 +233,8 @@ const Body = (props: IBodyProps) => {
             {showLetters()}
           </CardContent>
 
-{/*           {<Alert open={count <= 0} onClose={() => onInit(true)} lose={true} />}
- */}
+          {/*           {<Alert open={count <= 0} onClose={() => onInit(true)} lose={true} />}
+           */}
           {<Alert open={count <= 0} onClose={() => saveGame()} lose={true} />}
         </Card>
       )}
