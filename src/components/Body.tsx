@@ -218,11 +218,12 @@ const Body = (props: IBodyProps) => {
             >
               Dozvoljeni promašaji:
             </Typography>
-            <Typography variant={"h4"}>{count}</Typography>
+            <Typography variant={"h1"}>{count}</Typography>
             <div>
               <img
                 className={classes.country_flag}
-                src={`https://www.countryflags.io/${countryCode.toLowerCase()}/flat/64.png`}
+                // src={`https://www.countryflags.io/${countryCode.toLowerCase()}/flat/64.png`}
+                src={`http://www.geognos.com/api/en/countries/flag/${countryCode.toUpperCase()}.png`}
 
                 //src={`https://www.countryflags.io/${'at'}/flat/64.png`}
               />
@@ -233,7 +234,7 @@ const Body = (props: IBodyProps) => {
           </CardContent>
 
 
-          {<Alert open={count <= 0} onClose={() => onInit(true)} lose={true} />}
+          {<Alert open={count <= 0} onClose={() => saveGame()} lose={true} />}
         </Card>
       )}
 
