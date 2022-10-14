@@ -1,17 +1,17 @@
-import { CardContent, FormControl } from "@material-ui/core";
-import Card from "@material-ui/core/Card";
-import makeStyles from "@material-ui/core/styles/makeStyles";
-import Typography from "@material-ui/core/Typography";
-import * as React from "react";
-import { countries } from "../countries";
+import { CardContent, FormControl } from '@material-ui/core';
+import Card from '@material-ui/core/Card';
+import makeStyles from '@material-ui/core/styles/makeStyles';
+import Typography from '@material-ui/core/Typography';
+import * as React from 'react';
+import { countries } from '../countries';
 
-import Alert from "./Alert";
-import WinAlert from "./WinAlert";
+import Alert from './Alert';
+import WinAlert from './WinAlert';
 
 const useStyles = makeStyles({
   card: {
     minWidth: 275,
-    textAlign: "center",
+    textAlign: 'center',
   },
 
   title: {
@@ -21,16 +21,16 @@ const useStyles = makeStyles({
     marginBottom: 12,
   },
   button: {
-    backgroundColor: "red",
-    color: "#f4f4f4f4",
-    width: "25%",
+    backgroundColor: 'red',
+    color: '#f4f4f4f4',
+    width: '25%',
   },
   root: {
-    justifyContent: "center",
+    justifyContent: 'center',
   },
   country_flag: {
-    width: "100px",
-    height: "80px",
+    width: '100px',
+    height: '80px',
   },
 });
 interface IBodyProps {
@@ -49,10 +49,10 @@ const Body = (props: IBodyProps) => {
   }, []);
 
   React.useEffect(() => {
-    window.addEventListener("keypress", onKeyPress);
+    window.addEventListener('keypress', onKeyPress);
 
     return () => {
-      document.removeEventListener("keypress", onKeyPress);
+      document.removeEventListener('keypress', onKeyPress);
     };
   }, []);
 
@@ -90,7 +90,7 @@ const Body = (props: IBodyProps) => {
     ///postavi prazna polja
     let out = Array<string>();
     for (var i = 0; i < countryName.length; i++) {
-      out[i] = "_";
+      out[i] = '_';
     }
     setScoredLetter(out);
   };
@@ -130,23 +130,23 @@ const Body = (props: IBodyProps) => {
 
     setCount(6); ///current letter je "",pa skine jedan count
     setUsedLetters(Array<String>());
-    setCurrentLetter("");
+    setCurrentLetter('');
 
     if (!init) setInit(true);
   };
 
-  console.log("ScoredLetters:", scoredLetter);
-  console.log("CurrentLetter:", currentLetter);
-  console.log("Usedletters:", usedLetters);
-  console.log("UsedCountries", usedCountries);
-  console.log("CountryName", countryName);
-  console.log("score", score);
+  console.log('ScoredLetters:', scoredLetter);
+  console.log('CurrentLetter:', currentLetter);
+  console.log('Usedletters:', usedLetters);
+  console.log('UsedCountries', usedCountries);
+  console.log('CountryName', countryName);
+  console.log('score', score);
   console.log(init);
-  console.log("---------------------------------------------------");
+  console.log('---------------------------------------------------');
 
   const checkScored = (array: Array<String>) => {
     ///sve si pogodio!!!
-    return array.indexOf("_") == -1;
+    return array.indexOf('_') == -1;
   };
 
   const newLetter = (pressedLetter: string) => {
@@ -171,10 +171,10 @@ const Body = (props: IBodyProps) => {
 
   const showLetters = () => {
     newLetter(currentLetter);
-    let out = "";
+    let out = '';
 
     scoredLetter.map((m: string) => {
-      out += m + " ";
+      out += m + ' ';
     });
 
     if (scoredLetter.length != 0 && checkScored(scoredLetter)) {
@@ -190,9 +190,9 @@ const Body = (props: IBodyProps) => {
     }
 
     return (
-      <Typography variant={"h3"} style={{ marginBottom: "20px" }}>
-        {" "}
-        {out.toUpperCase()}{" "}
+      <Typography variant={'h3'} style={{ marginBottom: '20px' }}>
+        {' '}
+        {out.toUpperCase()}{' '}
       </Typography>
     );
   };
@@ -204,7 +204,7 @@ const Body = (props: IBodyProps) => {
           <CardContent>
             <Typography
               className={classes.title}
-              color="textSecondary"
+              color='textSecondary'
               gutterBottom
             >
               Ovo je zastava koje države ?
@@ -213,25 +213,23 @@ const Body = (props: IBodyProps) => {
           <CardContent classes={{ root: classes.root }}>
             <Typography
               ///  className={classes.title}
-              color="textSecondary"
+              color='textSecondary'
               gutterBottom
             >
               Dozvoljeni promašaji:
             </Typography>
-            <Typography variant={"h4"}>{count}</Typography>
+            <Typography variant={'h4'}>{count}</Typography>
             <div>
               <img
                 className={classes.country_flag}
-                src={`https://www.countryflags.io/${countryCode.toLowerCase()}/flat/64.png`}
+                src={`http://www.geognos.com/api/en/countries/flag/${countryCode.toUpperCase()}.png`}
 
                 //src={`https://www.countryflags.io/${'at'}/flat/64.png`}
               />
             </div>
 
             {showLetters()}
-
           </CardContent>
-
 
           {<Alert open={count <= 0} onClose={() => onInit(true)} lose={true} />}
         </Card>

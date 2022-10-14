@@ -1,13 +1,13 @@
-import * as React from "react";
+import * as React from 'react';
 import {
   Dialog,
   DialogTitle,
   DialogContent,
   DialogContentText,
   DialogActions,
-  Button
-} from "@material-ui/core";
-import { lightGreen, red } from "@material-ui/core/colors";
+  Button,
+} from '@material-ui/core';
+import { lightGreen, red } from '@material-ui/core/colors';
 
 interface IAlertProps {
   onClose: Function;
@@ -27,30 +27,32 @@ const Alert = (props: IAlertProps) => {
       <Dialog
         disableEscapeKeyDown
         fullWidth
-        maxWidth={"xs"}
+        maxWidth={'xs'}
         open={props.open}
         // style={{width:"450px" ,textAlign:"center"}}
         //  onClose={() => props.setAlert()}
       >
-        <DialogTitle style={{ textAlign: "center" }}>
-          {props.lose ? "Izgubio si" : country  + " odlično"}
+        <DialogTitle style={{ textAlign: 'center' }}>
+          {props.lose ? 'Izgubio si' : country + ' odlično'}
         </DialogTitle>
         <DialogContent>
-          <DialogContentText style={{ textAlign: "center" }}>
+          <DialogContentText style={{ textAlign: 'center' }}>
             {props.lose
-              ? "Potrošio si sve dozvoljene promašaje,klikni za novu igru."
-              : "Klikni za sljedeću zastavu."}
+              ? 'Potrošio si sve dozvoljene promašaje,klikni za novu igru.'
+              : 'Klikni za sljedeću zastavu.'}
           </DialogContentText>
         </DialogContent>
-        <DialogActions>
+        <DialogActions onDragEnter={() => props.onClose()}>
           <Button
-            onClick={() => props.onClose()}
+            //onClick={() => props.onClose()}
+            onKeyDown={() => props.onClose()}
+            onBlur={() => props.onClose()}
             fullWidth={true}
-            size="large"
-            variant={"outlined"}
-            style={{ backgroundColor: "lightblue" }}
+            size='large'
+            variant={'outlined'}
+            style={{ backgroundColor: 'lightblue' }}
           >
-            {"Start"}
+            {'Start'}
           </Button>
           {/*  <Button onClick={handleClose} color="primary" autoFocus>
             Agree
