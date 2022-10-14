@@ -222,6 +222,11 @@ const Body = (props: IBodyProps) => {
             <div>
               <img
                 className={classes.country_flag}
+            <Typography variant={"h1"}>{count}</Typography>
+            <div>
+              <img
+                className={classes.country_flag}
+                // src={`https://www.countryflags.io/${countryCode.toLowerCase()}/flat/64.png`}
                 src={`http://www.geognos.com/api/en/countries/flag/${countryCode.toUpperCase()}.png`}
 
                 //src={`https://www.countryflags.io/${'at'}/flat/64.png`}
@@ -231,7 +236,9 @@ const Body = (props: IBodyProps) => {
             {showLetters()}
           </CardContent>
 
-          {<Alert open={count <= 0} onClose={() => onInit(true)} lose={true} />}
+{/*           {<Alert open={count <= 0} onClose={() => onInit(true)} lose={true} />}
+ */}
+          {<Alert open={count <= 0} onClose={() => saveGame()} lose={true} />}
         </Card>
       )}
 
